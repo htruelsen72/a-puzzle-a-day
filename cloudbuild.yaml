@@ -1,0 +1,77 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+  substitutionOption: ALLOW_LOOSE
+  dynamic_substitutions: true
+  machineType: E2_HIGHCPU_8
+
+steps:
+- name: node:20-alpine
+  id: "install"
+  entrypoint: sh
+  args:
+    - "-c"
+    - |
+      npm ci
+
+- name: node:20-alpine
+  id: "build-backend"
+  entrypoint: sh
+  args:
+    - "-c"
+    - |
+      npx nx build daypuzzlesolver
+
+- name: node:20-alpine
+  id: "build-frontend"
+  entrypoint: sh
+  args:
+    - "-c"
+    - |
+      npx nx build daypuzzleui --configuration=production
+
+- name: gcr.io/cloud-builders/docker
+  id: "docker-backend"
+  args:
+    - build
+    - "-f"
+    - "Dockerfile.backend"
+    - "-t"
+    - "europe-west1-docker.pkg.dev/$PROJECT_ID/app/backend:$COMMIT_SHA"
+    - "."
+
+- name: gcr.io/cloud-builders/docker
+  id: "docker-frontend"
+  args:
+    - build
+    - "-f"
+    - "Dockerfile.frontend"
+    - "-t"
+    - "europe-west1-docker.pkg.dev/$PROJECT_ID/app/frontend:$COMMIT_SHA"
+    - "."
+
+- name: gcr.io/cloud-builders/docker
+  id: "push-backend"
+  args: ["push", "europe-west1-docker.pkg.dev/$PROJECT_ID/app/backend:$COMMIT_SHA"]
+
+- name: gcr.io/cloud-builders/docker
+  id: "push-frontend"
+  args: ["push", "europe-west1-docker.pkg.dev/$PROJECT_ID/app/frontend:$COMMIT_SHA"]
+
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  id: "deploy"
+  entrypoint: gcloud
+  args:
+    [
+      "deploy", "releases", "create", "release-$COMMIT_SHA",
+      "--delivery-pipeline", "daypuzzle-pipeline",
+      "--region", "europe-west1",
+      "--images",
+      "backend=europe-west1-docker.pkg.dev/$PROJECT_ID/app/backend:$COMMIT_SHA",
+      "frontend=europe-west1-docker.pkg.dev/$PROJECT_ID/app/frontend:$COMMIT_SHA"
+    ]
+
+timeout: "1800s"
+
+images:
+  - "europe-west1-docker.pkg.dev/$PROJECT_ID/app/backend:$COMMIT_SHA"
+  - "europe-west1-docker.pkg.dev/$PROJECT_ID/app/frontend:$COMMIT_SHA"

@@ -1,0 +1,25 @@
+<div>
+<form [formGroup]="form" class="p-4 flex items-center gap-4">
+    <mat-form-field appearance="outline">
+        <mat-label>Select date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="date" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="generate()" [disabled]="isGenerating || !form.valid">
+        Generate
+    </button>
+@if (isGenerating) {
+    Finding solution, please wait ({{ solutionTime }} ms)
+}
+@else if (solutionTime) {
+    Took {{solutionTime}} ms to find a solution
+}
+</form>
+</div>
+@if (templateData) {
+<app-puzzle-view [puzzleData]="puzzleResult" [templateData]="templateData"></app-puzzle-view>
+} @else {
+<div>Template data not fetched yet</div>
+}
+<router-outlet></router-outlet>

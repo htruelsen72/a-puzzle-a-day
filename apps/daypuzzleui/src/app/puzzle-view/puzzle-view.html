@@ -1,0 +1,9 @@
+<div class="grid">
+    @for (row of rows; track row) {
+    <div class="row">
+        @for (col of cols; track col) {
+        <div class="box" [style.background]="getColor(row, col)">{{getText(row, col)}}</div>
+        }
+    </div>
+    }
+</div>
