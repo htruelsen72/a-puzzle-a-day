@@ -6,7 +6,7 @@ options:
 
 steps:
 # 7. Terraform init
-- name: 'hashicorp/terraform:1.6.7'
+- name: 'gcr.io/cloud-builders/terraform'
   id: 'terraform-init'
   entrypoint: 'sh'
   args:
@@ -16,7 +16,7 @@ steps:
       terraform init
 
 # 8. Terraform plan
-- name: 'hashicorp/terraform:1.6.7'
+- name: 'gcr.io/cloud-builders/terraform'
   id: 'terraform-plan'
   entrypoint: 'sh'
   args:
@@ -26,7 +26,7 @@ steps:
       terraform plan -out=tfplan
 
 # 9. Terraform apply
-- name: 'hashicorp/terraform:1.6.7'
+- name: 'gcr.io/cloud-builders/terraform'
   id: 'terraform-apply'
   entrypoint: 'sh'
   args:
