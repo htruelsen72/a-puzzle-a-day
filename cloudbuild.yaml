@@ -57,18 +57,35 @@ steps:
   id: "push-frontend"
   args: ["push", "europe-west1-docker.pkg.dev/$PROJECT_ID/app/frontend:$COMMIT_SHA"]
 
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  id: "deploy"
-  entrypoint: gcloud
+# 7. Terraform init
+- name: 'hashicorp/terraform:1.6.7'
+  id: 'terraform-init'
+  entrypoint: 'sh'
   args:
-    [
-      "deploy", "releases", "create", "release-$COMMIT_SHA",
-      "--delivery-pipeline", "daypuzzle-pipeline",
-      "--region", "europe-west1",
-      "--images",
-      "backend=europe-west1-docker.pkg.dev/$PROJECT_ID/app/backend:$COMMIT_SHA",
-      "frontend=europe-west1-docker.pkg.dev/$PROJECT_ID/app/frontend:$COMMIT_SHA"
-    ]
+    - '-c'
+    - |
+      cd terraform
+      terraform init
+
+# 8. Terraform plan
+- name: 'hashicorp/terraform:1.6.7'
+  id: 'terraform-plan'
+  entrypoint: 'sh'
+  args:
+    - '-c'
+    - |
+      cd terraform
+      terraform plan -out=tfplan
+
+# 9. Terraform apply
+- name: 'hashicorp/terraform:1.6.7'
+  id: 'terraform-apply'
+  entrypoint: 'sh'
+  args:
+    - '-c'
+    - |
+      cd terraform
+      terraform apply -auto-approve tfplan
 
 timeout: "1800s"
 
