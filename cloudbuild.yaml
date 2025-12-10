@@ -19,7 +19,7 @@ steps:
   args:
     - "-c"
     - |
-      npx nx build daypuzzlesolver
+      npx nx build daypuzzlesolver -c production
 
 - name: node:24-alpine
   id: "build-frontend"

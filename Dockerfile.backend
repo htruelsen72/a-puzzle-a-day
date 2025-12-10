@@ -1,12 +1,11 @@
 # Runtime Dockerfile for backend. Expects built output at dist/apps/daypuzzlesolver
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
-COPY apps/daypuzzlesolver/package*.json ./
-RUN npm install --production
-
 COPY dist/apps/daypuzzlesolver ./dist
+
+RUN cd dist && npm install --production
 
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
