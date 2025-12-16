@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "htruelsen72/Henrik Truelsen",
   "license": "ISC",
   "dependencies": {
     "@angular/common": "~20.3.0",
