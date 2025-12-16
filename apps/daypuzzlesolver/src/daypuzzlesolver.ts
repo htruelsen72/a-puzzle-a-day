@@ -173,7 +173,7 @@ export class DayPuzzleSolver {
       if (this.canPlaceBrick(puzzle, currentBrick, row, col, direction)) {
         const currentPuzzle = new Array(...puzzle);
         this.placeBrick(currentPuzzle, currentBrick, row, col, direction);
-        if (currentBrickIndex === bricks.length - 1)
+        if (currentBrickIndex === bricks.length - 1) // Last brick placed, solved
           return [new BrickWithPosition(row, col, direction, currentBrick)];
         match = this.addBrick(currentPuzzle, bricks, currentBrickIndex + 1);
         if (match) {
@@ -222,12 +222,12 @@ export class DayPuzzleSolver {
     const emptyWithoutNeighbours = tmpPuzzle.some((value, index) => {
       if (value === 1) return false;
       if (value > 1) return true;
-      return this.numberOfEmptyNeighbours(index, tmpPuzzle);
+      return this.noEmptyNeighbours(index, tmpPuzzle);
     });
     return !emptyWithoutNeighbours;
   }
 
-  private numberOfEmptyNeighbours(index: number, tmpPuzzle: number[]): boolean {
+  private noEmptyNeighbours(index: number, tmpPuzzle: number[]): boolean {
     let neighboursEmpty = 0;
     if (index !== 0 && index % this.cols !== 0) {
       if (tmpPuzzle[index - 1] === 0) neighboursEmpty++;
